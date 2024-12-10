@@ -1,3 +1,67 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+.sidebar {
+    background-color: #1e1e2f; /* Deep dark blue for modern look */
+    min-height: 100vh; /* Full height */
+    padding: 15px;
+}
+
+.sidebar .nav-link {
+    color: #e0e0e0; /* Light gray text for readability */
+    font-weight: 500; /* Medium font weight for better emphasis */
+    border-radius: 5px; /* Rounded corners for a softer look */
+    transition: all 0.3s ease; /* Smooth hover animation */
+}
+
+.sidebar .nav-link.active {
+    background-color: #444466; /* Highlight active link with a muted blue */
+    color: white; /* Keep text bright on active link */
+}
+
+.sidebar .nav-link:hover {
+    background-color: #565676; /* Slightly lighter blue on hover */
+    color: white; /* Bright text on hover */
+    text-decoration: none; /* No underline */
+}
+
+.sidebar .nav-link i {
+    font-size: 1.2rem; /* Larger icon size for clarity */
+}
+
+/* Table Enhancements */
+.table {
+    font-size: 1rem;
+    border-radius: 10px; /* Rounded corners for a modern look */
+    overflow: hidden; /* Ensure no content overflows */
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    padding: 12px;
+    text-align: center; /* Center text for better alignment */
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9; /* Light background for odd rows */
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1; /* Slightly gray on hover */
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+/* Empty State Message */
+.text-muted {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #6c757d;
+}
