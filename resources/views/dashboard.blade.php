@@ -97,11 +97,9 @@
 
                 <!-- Content -->
                 <div class="main-content">
-                    @yield('content')
-
-                    <!-- Example of dynamic content -->
+                    <!-- Dynamic Welcome Section -->
                     <div id="dashboard-overview">
-                        <h3>Welcome, User!</h3>
+                        <h3>Welcome, {{ auth()->user()->name }}!</h3>
                         <p>Here is an overview of your recent activity:</p>
                         <ul>
                             <li><strong>Bilete cumpărate:</strong> 5</li>
@@ -110,6 +108,38 @@
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- Modal: Edit Profile -->
+    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">Editare Profil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form to Edit Profile -->
+                    <form method="POST" action="{{ route('profile.update') }}">
+                        @csrf
+                        @method('PATCH')
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">Nume</label>
+                            <input type="text" class="form-control" id="userName" name="name" value="{{ auth()->user()->name }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="userEmail" name="email" value="{{ auth()->user()->email }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userPassword" class="form-label">Parolă</label>
+                            <input type="password" class="form-control" id="userPassword" name="password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvează</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -145,35 +175,6 @@
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Cumpără</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal: Profil -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="profileModalLabel">Editare Profil</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="userName" class="form-label">Nume</label>
-                            <input type="text" class="form-control" id="userName" value="John Doe" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="userEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="userEmail" value="johndoe@example.com" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="userPassword" class="form-label">Parolă</label>
-                            <input type="password" class="form-control" id="userPassword">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salvează</button>
                     </form>
                 </div>
             </div>
