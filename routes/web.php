@@ -1,39 +1,35 @@
-    <?php
+<?php
 
-    use App\Http\Controllers\ProfileController;
-    use App\Http\Controllers\TicketController;
-    use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TicketController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
-    Route::get('/', function () {
-        return view('welcome');
-    });
+Route::get('/', function () {
+    return view('welcome');
+});
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->middleware(['auth', 'verified'])->name('dashboard');
+// Group for authenticated users with verified email
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard Route (using DashboardController)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/login', function () {
-        return view('login'); 
-    })->name('login');
+    // Profile Routes
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::middleware('auth')->group(function () {
-        // Profile Routes
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Ticket Routes (handling purchases and subscriptions)
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');  // List available tickets
+    Route::post('/tickets/buy', [TicketController::class, 'buy'])->name('tickets.buy');  // Purchase a ticket
+    Route::post('/tickets/subscribe', [TicketController::class, 'subscribe'])->name('tickets.subscribe');  // Subscribe route
+    
+    // Add balance route
+    Route::post('/tickets/add-balance', [TicketController::class, 'addBalance'])->name('tickets.addBalance');  // Add balance to user
+});
 
-        // Ticket Routes
-        Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
-        Route::get('/tickets/buy', [TicketController::class, 'buy'])->name('tickets.buy');
-        Route::post('/tickets/1day', [TicketController::class, 'buy1Day'])->name('tickets.buy1day');
-        Route::post('/tickets/subscribe', [TicketController::class, 'subscribe'])->name('tickets.subscribe');
-    });
+Route::get('/login', function () {
+    return view('login');
+})->name('login');
 
-    require __DIR__.'/auth.php';
-
-    Route::middleware('auth')->group(function () {
-        Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
-        Route::get('/tickets/buy', [TicketController::class, 'buy'])->name('tickets.buy');
-        Route::post('/tickets/buy1day', [TicketController::class, 'buy1Day'])->name('tickets.buy1Day');
-        Route::post('/tickets/subscribe', [TicketController::class, 'subscribe'])->name('tickets.subscribe');
-    });
+require __DIR__.'/auth.php';

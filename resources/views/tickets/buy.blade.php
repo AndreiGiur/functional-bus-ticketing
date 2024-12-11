@@ -42,6 +42,7 @@
                     <div class="mb-3">
                         <label for="ticketType" class="form-label">Alege tipul biletului</label>
                         <select class="form-select" id="ticketType" name="ticketType" required>
+                            <option value="Bilet de 90 de minute">Bilet de 90 de minute</option>
                             <option value="1-day">Bilet pentru 1 zi</option>
                             <option value="subscription">Abonament lunar</option>
                         </select>
@@ -79,7 +80,7 @@
 
     <!-- Footer -->
     <footer class="bg-dark text-white text-center py-3 mt-5">
-        <p>&copy; 2024 Ticket System. Toate drepturile rezervate.</p>
+        <p>&copy;  Proiect AN 2 Programare Functionala. Student - Giurgiuveanu Andrei-Ionut.</p>
     </footer>
 
     <!-- Bootstrap 5 JS -->

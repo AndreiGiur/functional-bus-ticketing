@@ -8,6 +8,7 @@
             <h3 class="card-title mb-0">Lista de bilete disponibile</h3>
         </div>
         <div class="card-body">
+            <!-- Display status messages -->
             @if (session('status'))
                 <div class="alert alert-success">
                     {{ session('status') }}
@@ -28,12 +29,18 @@
                         @foreach ($tickets as $index => $ticket)
                             <tr>
                                 <td>{{ $index + 1 }}</td>
-                                <td>{{ $ticket['type'] }}</td>
-                                <td>{{ number_format($ticket['price'], 2) }} RON</td>
+                                <td>{{ $ticket->type }}</td>
+                                <td>{{ number_format($ticket->price, 2) }} RON</td>
                                 <td>
-                                    <a href="{{ route('tickets.buy') }}" class="btn btn-sm btn-primary" title="Cumpără acest bilet">
-                                        Cumpără
-                                    </a>
+                                    <!-- Form to buy the ticket -->
+                                    <form action="{{ route('tickets.buy') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="ticket_id" value="{{ $ticket->id }}">
+                                        <input type="hidden" name="ticket_price" value="{{ $ticket->price }}">
+                                        <button type="submit" class="btn btn-sm btn-primary" title="Cumpără acest bilet">
+                                            Cumpără
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

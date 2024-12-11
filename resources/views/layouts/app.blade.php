@@ -29,7 +29,7 @@
 
             <!-- Page Content -->
             <main>
-                {{ $slot }}
+                @yield('content') <!-- This will be the section where content is injected -->
             </main>
         </div>
     </body>
