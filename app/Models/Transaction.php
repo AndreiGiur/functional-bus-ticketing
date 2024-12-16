@@ -9,15 +9,34 @@ class Transaction extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'user_id',
-        'ticket_id',  // Assuming this is the foreign key for the Ticket
+        'ticket_id',  // Foreign key for Ticket
         'amount',
         'type',
         'status',
     ];
 
-    // Define the relationship with Ticket
+    /**
+     * Define the relationship with User.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Define the relationship with Ticket.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function ticket()
     {
         return $this->belongsTo(Ticket::class);

@@ -20,6 +20,10 @@ class CreatePurchasedTicketsTable extends Migration
             $table->integer('quantity'); // Quantity of tickets purchased
             $table->decimal('total_price', 8, 2); // Total price for the purchase
             $table->timestamps(); // Timestamps (created_at and updated_at)
+
+            // Optionally add indexes for performance
+            $table->index('user_id');
+            $table->index('ticket_type');
         });
     }
 

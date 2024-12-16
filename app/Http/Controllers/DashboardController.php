@@ -12,22 +12,30 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        // Fetch the logged-in user's balance
-        $balance = Auth::user()->balance;
-
-        // Debugging: Dump the balance to ensure it's not null or empty
-        if (is_null($balance)) {
-            // Optionally, handle null balance scenario
-            return redirect()->route('dashboard')->with('error', 'Balance is not set.');
+        // Ensure there is a logged-in user
+        $user = Auth::user();
+        if (is_null($user)) {
+            return redirect()->route('login')->with('error', 'You must be logged in to access the dashboard.');
         }
 
-        // Fetch all available tickets from the Ticket model
-        $tickets = Ticket::all();
+        // Fetch the logged-in user's balance
+        $balance = $user->balance;
+        if (is_null($balance)) {
+            // Handle null balance scenario, e.g., redirect to profile
+            return redirect()->route('profile')->with('error', 'Please set your balance in your profile.');
+        }
+
+        // Fetch paginated tickets scoped to public or specific conditions
+        $tickets = Ticket::latest()->paginate(config('app.pagination_limit', 20));
 
         // Fetch the recent transactions of the logged-in user
-        $recentTransactions = Auth::user()->transactions()->latest()->take(5)->get();
+        $recentTransactions = $user->transactions()->latest()->take(5)->get() ?? collect();
 
         // Return the dashboard view with the data
-        return view('dashboard', compact('balance', 'tickets', 'recentTransactions'));
+        return view('dashboard', [
+            'balance' => $balance,
+            'tickets' => $tickets,
+            'recentTransactions' => $recentTransactions,
+        ]);
     }
 }
