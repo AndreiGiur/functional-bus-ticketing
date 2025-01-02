@@ -23,7 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');  // List available tickets
     Route::post('/tickets/buy', [TicketController::class, 'buy'])->name('tickets.buy');  // Purchase a ticket
     Route::post('/tickets/subscribe', [TicketController::class, 'subscribe'])->name('tickets.subscribe');  // Subscribe route
-
+    Route::post('/tickets/add-funds', [TicketController::class, 'addFunds'])->name('tickets.addFunds');
     // Add balance route
     Route::post('/tickets/add-funds', [TicketController::class, 'addFunds'])->name('tickets.addFunds');  // Add balance to user
 });
