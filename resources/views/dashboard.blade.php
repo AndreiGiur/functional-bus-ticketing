@@ -13,7 +13,7 @@
             </div>
             <div class="text-center text-xl font-bold">
                 <p style="color: white;">Your Balance</p>
-                <p>{{ number_format($balance, 2) }} RON</p>
+                <p>{{ $balance }} RON</p>
             </div>
         </div>
     </div>
@@ -49,18 +49,28 @@
             <div class="bg-gray-800 p-6 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold text-white">Adauga fonduri</h2>
                 <div class="mt-4">
-                    <form action="{{ route('tickets.addFunds') }}" method="POST">
+                    <form action="{{ route('balance.add') }}" method="POST">
                         @csrf
                         <div class="mb-4">
                             <label for="amount" class="block text-sm font-medium text-white">Enter amount to add</label>
-                            <input type="number" name="amount" id="amount" min="1" class="w-full p-2 mt-2 border border-gray-300 rounded-md" placeholder="Enter amount in RON" required>
+                            <input
+                                type="number"
+                                name="amount"
+                                id="amount"
+                                min="1"
+                                class="w-full p-2 mt-2 border border-gray-300 rounded-md"
+                                placeholder="Enter amount in RON"
+                                required>
                         </div>
-                        <button type="submit" class="w-full py-2 px-4 bg-green-600 text-white rounded-md">
+                        <button
+                            type="submit"
+                            class="w-full py-2 px-4 bg-green-600 text-white rounded-md">
                             Add Balance
                         </button>
                     </form>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

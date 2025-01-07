@@ -24,6 +24,10 @@ class Transaction extends Model
         'status',     // Status of the transaction (e.g., completed, pending)
     ];
 
+    public static function where(string $string, int|string|null $id)
+    {
+    }
+
     /**
      * Relationship: Transaction belongs to a Ticket.
      *

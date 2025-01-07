@@ -2,47 +2,86 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Ticket;
+use App\Models\Transaction;
+use App\Http\Controllers\BalanceController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class TicketController extends Controller
 {
-    /**
-     * Buy a ticket using the Lambda function
-     */
-    public function buy(Request $request)
+    public function index()
     {
-        // Validate the ticket type input
+          }
+
+    public function getUserTickets(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application
+    {
+        // Fetch the authenticated user
+        $user = Auth::user();
+
+        // Fetch tickets linked to the user via transactions
+        $userTickets = Transaction::where('user_id', $user->id)
+            ->where('type', 'ticket_purchase') // Ensure it's a ticket purchase transaction
+            ->with('ticket') // Eager load related tickets
+            ->latest() // Order by most recent transactions
+            ->get();
+
+        // Return the view with the fetched tickets
+        return view('dashboard', compact('userTickets'));
+    }
+
+
+
+    public function buyTicket(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            throw new \Exception('User not authenticated.');
+        }
+
+        if ($user->balance <= 0) {
+            throw new \Exception('Insufficient funds to buy a ticket.');
+        }
+
         $validated = $request->validate([
-            'ticketType' => 'required|in:1,2,3', // Allowable ticket types
+            'ticketType' => 'required|in:1,2,3',
         ]);
 
-        try {
-            // Call the Lambda function via API Gateway
-            $response = Http::post('http://127.0.0.1:8000/tickets/buy', [
-                'ticketType' => $validated['ticketType'],
-                'userId' => Auth::id(), // Ensure the authenticated user ID is passed
-            ]);
+        $ticketPrices = [1 => 3, 2 => 15, 3 => 80];
+        $ticketType = $validated['ticketType'];
+        $price = $ticketPrices[$ticketType];
 
-            // Check if the request to Lambda failed
-            if ($response->failed()) {
-                return redirect()
-                    ->route('tickets.index')
-                    ->with('status', 'Failed to buy ticket. Please try again.');
-            }
+        // Deduct the ticket price from the user's balance
+        $user->balance -= $price;
+        $user->save();
 
-            // Success response
-            return redirect()
-                ->route('tickets.index')
-                ->with('status', 'Ticket purchased successfully!');
-        } catch (\Exception $e) {
-            // Catch and log any exceptions
-            \Log::error('Error buying ticket: ' . $e->getMessage());
+        // Log the ticket purchase
+        \Log::info('Ticket purchase processed', [
+            'user_id' => $user->id,
+            'ticket_type' => $ticketType,
+            'price' => $price,
+        ]);
 
-            return redirect()
-                ->route('tickets.index')
-                ->with('status', 'An unexpected error occurred. Please try again later.');
-        }
+        // Create a new ticket for the user
+        $ticket = Ticket::create([
+            'user_id' => $user->id, // Explicitly set the user_id
+            'type' => $ticketType,
+            'price' => $price,
+        ]);
+
+        // Create the associated transaction
+        Transaction::create([
+            'user_id' => $user->id,
+            'amount' => $price,
+            'type' => 'ticket_purchase',
+            'status' => 'completed',
+        ]);
+
+        return redirect()->route('tickets.index')->with('status', 'Ticket purchased successfully!');
     }
+
 }
