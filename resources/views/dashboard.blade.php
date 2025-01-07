@@ -24,7 +24,7 @@
         <div class="bg-gray-800 p-6 rounded-lg shadow-md">
             <h2 class="text-xl font-semibold text-white">Cumpara un bilet</h2>
             <div class="mt-4">
-<form action="{{ route('tickets.buy', [], false) ?? url('/tickets/buy') }}" method="POST">
+                <form action="{{ route('tickets.buy', [], false) ?? url('/tickets/buy') }}" method="POST">
                     @csrf
                     <div class="mb-4">
                         <label for="ticketType" class="block text-sm font-medium text-white">Selecteaza un bilet</label>
@@ -49,7 +49,7 @@
         <div class="bg-gray-800 p-6 rounded-lg shadow-md">
             <h2 class="text-xl font-semibold text-white">Adauga fonduri</h2>
             <div class="mt-4">
-                <form action="{{ route('tickets.addFunds') }}" method="POST">
+                <form action="{{ route('balance.add') }}" method="POST">
                     @csrf
                     <div class="mb-4">
                         <label for="amount" class="block text-sm font-medium text-white">Enter amount to add</label>

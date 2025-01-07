@@ -24,7 +24,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/tickets', [TicketController::class, 'index'])->name('tickets.index');  // List available tickets
     Route::post('/tickets/buy', [TicketController::class, 'buyTicket'])->name('tickets.buy');  // Purchase a ticket
     Route::post('/tickets/subscribe', [TicketController::class, 'subscribe'])->name('tickets.subscribe');  // Subscribe route
-    Route::post('/tickets/add-funds', [TicketController::class, 'addFunds'])->name('tickets.addFunds');
 
     // Add balance route
     Route::post('/balance/add', [BalanceController::class, 'addFunds'])->name('balance.add');
