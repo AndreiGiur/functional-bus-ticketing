@@ -20,31 +20,31 @@ class BalanceController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
-            throw new \Exception('User not authenticated.');
-        }
+        // Lambda to handle user authentication check
+        $checkAuthenticated = fn() => !$user ? throw new \Exception('User not authenticated.') : null;
+        $checkAuthenticated();
 
-        if ($amount <= 0) {
-            throw new \Exception('The amount to be added must be greater than zero.');
-        }
+        // Lambda to validate the amount
+        $validateAmount = fn() => $amount <= 0 ? throw new \Exception('The amount to be added must be greater than zero.') : null;
+        $validateAmount();
 
-        DB::beginTransaction();
+        // Lambda for transaction handling
+        $handleTransaction = function () use ($user, $amount) {
+            DB::beginTransaction();
+            try {
+                $user->balance += $amount;
+                $user->save();
 
-        try {
+                DB::commit();
+                return $user->balance;
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+        };
 
-            \Log::info('Adding funds for user ID: ' . Auth::id());
-            \Log::info('Amount: ' . $amount);
-
-            $user->balance += $amount;
-            $user->save();
-
-            DB::commit();
-
-            return $user->balance;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
+        // Execute the transaction handling lambda
+        return $handleTransaction();
     }
 
     /**
@@ -55,22 +55,26 @@ class BalanceController extends Controller
      */
     public function addFunds(Request $request)
     {
-        // Validate the request
-        $validated = $request->validate([
+        // Lambda for validating the request
+        $validateRequest = fn($req) => $req->validate([
             'amount' => 'required|numeric|min:1',
+        ]);
+        $validated = $validateRequest($request);
+
+        // Lambda for creating a transaction record
+        $createTransaction = fn($userId, $amount) => Transaction::create([
+            'user_id' => $userId,
+            'amount' => $amount,
+            'type' => 'fund_addition',
+            'status' => 'completed',
         ]);
 
         try {
             // Add funds to the user's balance
-            $this->addBalance($validated['amount']);
+            $newBalance = $this->addBalance($validated['amount']);
 
             // Record the transaction
-            Transaction::create([
-                'user_id' => Auth::id(),
-                'amount' => $validated['amount'],
-                'type' => 'fund_addition',
-                'status' => 'completed',
-            ]);
+            $createTransaction(Auth::id(), $validated['amount']);
 
             return redirect()->route('dashboard')->with('status', 'Fonduri adăugate cu succes!');
         } catch (\Exception $e) {

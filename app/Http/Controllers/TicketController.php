@@ -13,9 +13,21 @@ use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
 {
-    public function index()
+    public function index(){
+    }
+
+    private const TICKET_TYPES = [
+        ['id' => 1, 'name' => '90-min Ticket', 'price' => 3],
+        ['id' => 2, 'name' => '1-Day Ticket', 'price' => 15],
+        ['id' => 3, 'name' => 'Monthly Subscription', 'price' => 80],
+    ];
+
+
+    public function getAllTicketTypes()
     {
-          }
+        // Use the globally defined ticket types
+        return response()->json(self::TICKET_TYPES);
+    }
 
     public function getUserTickets(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application
     {
@@ -33,55 +45,66 @@ class TicketController extends Controller
         return view('dashboard', compact('userTickets'));
     }
 
-
-
     public function buyTicket(Request $request)
     {
         $user = Auth::user();
 
-        if (!$user) {
-            throw new \Exception('User not authenticated.');
-        }
+        // Lambda to check if the user is authenticated
+        $checkAuthentication = fn() => !$user ? throw new \Exception('User not authenticated.') : null;
+        $checkAuthentication();
 
-        if ($user->balance <= 0) {
-            throw new \Exception('Insufficient funds to buy a ticket.');
-        }
+        // Lambda to check for sufficient balance
+        $checkBalance = fn() => $user->balance <= 0 ? throw new \Exception('Insufficient funds to buy a ticket.') : null;
+        $checkBalance();
 
+        // Validate request input
         $validated = $request->validate([
             'ticketType' => 'required|in:1,2,3',
         ]);
 
+        // Define ticket prices
         $ticketPrices = [1 => 3, 2 => 15, 3 => 80];
+
+        // Lambda to fetch ticket price
+        $getTicketPrice = fn($ticketType) => $ticketPrices[$ticketType];
         $ticketType = $validated['ticketType'];
-        $price = $ticketPrices[$ticketType];
+        $price = $getTicketPrice($ticketType);
 
         // Deduct the ticket price from the user's balance
-        $user->balance -= $price;
+        $deductBalance = fn() => $user->balance -= $price;
+        $deductBalance();
         $user->save();
 
-        // Log the ticket purchase
-        \Log::info('Ticket purchase processed', [
+        $logMessage = fn($message, $context = []) => \Log::info($message, $context);
+
+        $logMessage('Cumpararea tichetului a fost initializata cu succes', [
             'user_id' => $user->id,
             'ticket_type' => $ticketType,
             'price' => $price,
         ]);
 
-        // Create a new ticket for the user
-        $ticket = Ticket::create([
-            'user_id' => $user->id, // Explicitly set the user_id
+        $logMessage('Creaza tichet pentru utilizator', [
+            'user_id' => $user->id,
+        ]);
+
+        $createTicket = fn() => Ticket::create([
+            'user_id' => $user->id,
             'type' => $ticketType,
             'price' => $price,
         ]);
+        $ticket = $createTicket();
 
         // Create the associated transaction
-        Transaction::create([
+        $createTransaction = fn() => Transaction::create([
             'user_id' => $user->id,
             'amount' => $price,
             'type' => 'ticket_purchase',
             'status' => 'completed',
         ]);
+        $createTransaction();
 
-        return redirect()->route('tickets.index')->with('status', 'Ticket purchased successfully!');
+        return redirect()->route('dashboard')->with('status', 'Tichet cumparat cu succes!');
     }
+
 
 }

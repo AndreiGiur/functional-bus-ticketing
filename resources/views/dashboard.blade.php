@@ -13,7 +13,7 @@
             </div>
             <div class="text-center text-xl font-bold">
                 <p style="color: white;">Your Balance</p>
-                <p>{{ $balance }} RON</p>
+                <p>{{ number_format($balance, 2) }} RON</p>
             </div>
         </div>
     </div>
@@ -24,7 +24,7 @@
         <div class="bg-gray-800 p-6 rounded-lg shadow-md">
             <h2 class="text-xl font-semibold text-white">Cumpara un bilet</h2>
             <div class="mt-4">
-                <form action="{{ route('tickets.buy', [], false) ?? url('/tickets/buy') }}" method="POST">
+                <form action="{{ route('tickets.buy') }}" method="POST">
                     @csrf
                     <div class="mb-4">
                         <label for="ticketType" class="block text-sm font-medium text-white">Selecteaza un bilet</label>
@@ -36,7 +36,7 @@
                         </select>
                     </div>
 
-                    <!-- Proceed to Payment button (only visible when ticket is selected) -->
+                    <!-- Proceed to Payment button -->
                     <p id="balanceWarning" class="text-red-500 text-sm mt-2" style="display: none;">Insufficient funds to buy this ticket.</p>
                     <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white rounded-md mt-4" id="paymentButton" style="display: none;">
                         Proceed to Payment
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <!-- Add Balance Section (Always visible) -->
+        <!-- Add Balance Section -->
         <div class="bg-gray-800 p-6 rounded-lg shadow-md">
             <h2 class="text-xl font-semibold text-white">Adauga fonduri</h2>
             <div class="mt-4">
@@ -62,15 +62,44 @@
             </div>
         </div>
     </div>
-</div>
-</div>
+
+    <!-- Purchased Tickets Section -->
+    <div class="bg-gray-800 p-6 rounded-lg shadow-md mt-6">
+        <h2 class="text-xl font-semibold text-white">Bilete Cumpărate</h2>
+        @if($purchasedTickets->isEmpty())
+        <p class="text-gray-400 mt-2">Nu ai cumpărat încă bilete.</p>
+        @else
+        <table class="table-auto w-full mt-4 border-collapse border border-gray-700 rounded-lg overflow-hidden">
+            <thead class="bg-gray-700">
+            <tr class="text-left text-white">
+                <th class="px-4 py-3 border border-gray-600">Tip Bilet</th>
+                <th class="px-4 py-3 border border-gray-600">Preț</th>
+                <th class="px-4 py-3 border border-gray-600">Cantitate</th>
+                <th class="px-4 py-3 border border-gray-600">Data Cumpărării</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($purchasedTickets as $index => $ticket)
+            <tr class="{{ $index % 2 === 0 ? 'bg-gray-800' : 'bg-gray-700' }} text-white hover:bg-gray-600">
+                <td class="px-4 py-3 border border-gray-600">{{ $ticket->type_name }}</td>
+                <td class="px-4 py-3 border border-gray-600">{{ number_format($ticket->price, 2) }} RON</td>
+                <td class="px-4 py-3 border border-gray-600">{{ $ticket->quantity }}</td>
+                <td class="px-4 py-3 border border-gray-600">
+                    {{ $ticket->created_at ? \Carbon\Carbon::parse($ticket->created_at)->format('d-m-Y H:i') : 'N/A' }}
+                </td>
+            </tr>
+            @endforeach
+            </tbody>
+        </table>
+
+        @endif
+    </div>
 
 <script>
-    // Show the "Proceed to Payment" button only if a ticket is selected
     document.getElementById('ticketType').addEventListener('change', function() {
         var paymentButton = document.getElementById('paymentButton');
         var balanceWarning = document.getElementById('balanceWarning');
-        var ticketPrices = {1: 3, 2: 15, 3: 80}; // Corresponding ticket prices in RON
+        var ticketPrices = {1: 3, 2: 15, 3: 80};
         var selectedTicketPrice = ticketPrices[this.value] || 0;
         var currentBalance = {{ isset($balance) ? $balance : 0 }};
 
@@ -79,7 +108,7 @@
             paymentButton.style.display = 'block';
         } else if (this.value) {
             balanceWarning.style.display = 'block';
-            balanceWarning.textContent = 'Insufficient funds to buy this ticket.';
+            balanceWarning.textContent = 'Fonduri Insuficiente';
             paymentButton.style.display = 'none';
         } else {
             balanceWarning.style.display = 'none';
@@ -88,4 +117,3 @@
     });
 </script>
 @endsection
-
