@@ -49,28 +49,22 @@ class TicketController extends Controller
     {
         $user = Auth::user();
 
-        // Lambda to check if the user is authenticated
         $checkAuthentication = fn() => !$user ? throw new \Exception('User not authenticated.') : null;
         $checkAuthentication();
 
-        // Lambda to check for sufficient balance
         $checkBalance = fn() => $user->balance <= 0 ? throw new \Exception('Insufficient funds to buy a ticket.') : null;
         $checkBalance();
 
-        // Validate request input
         $validated = $request->validate([
             'ticketType' => 'required|in:1,2,3',
         ]);
 
-        // Define ticket prices
         $ticketPrices = [1 => 3, 2 => 15, 3 => 80];
 
-        // Lambda to fetch ticket price
         $getTicketPrice = fn($ticketType) => $ticketPrices[$ticketType];
         $ticketType = $validated['ticketType'];
         $price = $getTicketPrice($ticketType);
 
-        // Deduct the ticket price from the user's balance
         $deductBalance = fn() => $user->balance -= $price;
         $deductBalance();
         $user->save();
@@ -94,7 +88,6 @@ class TicketController extends Controller
         ]);
         $ticket = $createTicket();
 
-        // Create the associated transaction
         $createTransaction = fn() => Transaction::create([
             'user_id' => $user->id,
             'amount' => $price,

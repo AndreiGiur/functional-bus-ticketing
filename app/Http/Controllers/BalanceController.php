@@ -20,15 +20,12 @@ class BalanceController extends Controller
     {
         $user = Auth::user();
 
-        // Lambda to handle user authentication check
         $checkAuthenticated = fn() => !$user ? throw new \Exception('User not authenticated.') : null;
         $checkAuthenticated();
 
-        // Lambda to validate the amount
         $validateAmount = fn() => $amount <= 0 ? throw new \Exception('The amount to be added must be greater than zero.') : null;
         $validateAmount();
 
-        // Lambda for transaction handling
         $handleTransaction = function () use ($user, $amount) {
             DB::beginTransaction();
             try {
@@ -43,7 +40,6 @@ class BalanceController extends Controller
             }
         };
 
-        // Execute the transaction handling lambda
         return $handleTransaction();
     }
 
