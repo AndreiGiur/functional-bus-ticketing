@@ -12,7 +12,7 @@
                 <p class="text-sm" style="color: white;">Portofelul tau!</p>
             </div>
             <div class="text-center text-xl font-bold">
-                <p style="color: white;">Your Balance</p>
+                <p style="color: white;">Balanta ta</p>
                 <p>{{ number_format($balance, 2) }} RON</p>
             </div>
         </div>
