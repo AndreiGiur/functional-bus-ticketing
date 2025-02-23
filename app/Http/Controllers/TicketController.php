@@ -45,7 +45,7 @@ class TicketController extends Controller
         return view('dashboard', compact('userTickets'));
     }
 
-    public function buyTicket(Request $request)
+    public function buyTicket(Request $request): \Illuminate\Http\RedirectResponse
     {
         $user = Auth::user();
 

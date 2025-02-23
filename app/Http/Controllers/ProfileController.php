@@ -11,23 +11,16 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show the form for editing the user's profile.
-     */
     public function edit(Request $request): View
     {
         // Ensure the correct user is fetched
         $user = $request->user();
 
-        // Return the profile edit view with the user's data
         return view('profile.edit', [
             'user' => $user,
         ]);
     }
 
-    /**
-     * Update the user's profile information.
-     */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         // Get the authenticated user
@@ -36,24 +29,17 @@ class ProfileController extends Controller
         // Get the validated data from the request
         $validatedData = $request->validated();
 
-        // Update the profile fields with the validated data
         $user->fill($validatedData);
 
-        // If the email is changed, reset the email verification date
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
 
-        // Save the updated user information
         $user->save();
 
-        // Redirect back to the profile edit page with a success message
         return Redirect::route('profile.edit')->with('status', __('Profile updated successfully.'));
     }
 
-    /**
-     * Delete the authenticated user's account.
-     */
     public function destroy(Request $request): RedirectResponse
     {
         // Validate that the password is correct before deletion

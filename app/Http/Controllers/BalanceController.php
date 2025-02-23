@@ -66,10 +66,8 @@ class BalanceController extends Controller
         ]);
 
         try {
-            // Add funds to the user's balance
             $newBalance = $this->addBalance($validated['amount']);
 
-            // Record the transaction
             $createTransaction(Auth::id(), $validated['amount']);
 
             return redirect()->route('dashboard')->with('status', 'Fonduri adăugate cu succes!');
